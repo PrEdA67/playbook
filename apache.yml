@@ -1,0 +1,8 @@
+---
+  - hosts: webservers
+    sudo: yes
+    become_user: root
+    become_method: sudo
+    tasks:
+      - name: installation apache
+        apt: name=apache2 update_cache=yes state=latest
