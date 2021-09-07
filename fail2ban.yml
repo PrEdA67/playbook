@@ -1,0 +1,32 @@
+--- 
+- name: installs fail2ban on ansible hosts
+  hosts: webservers
+  become: yes
+  tasks:
+  
+  - name: install apt fail2ban packages
+    apt: 
+      name: "{{ item }}"   
+      state: latest
+      update_cache: yes
+      cache_valid_time: 3600
+    with_items:
+      - fail2ban
+      - sendmail
+  
+  - name: override the basic fail2ban configuration with .local file
+    copy:
+      src: jail.local
+      dest: /etc/fail2ban/jail.local
+      owner: root
+      group: root
+      mode: 0644
+  vars:
+    fail2ban_filterd_path: ../../../files/fail2ban/etc/fail2ban/filter.d/
+    fail2ban_services:
+      - name: apache-wordpress-logins
+        port: http,https,80
+        filter: apache-wordpress-logins
+        logpath: /var/log/apache2/access.log
+        maxretry: 5
+        findtime: 120
